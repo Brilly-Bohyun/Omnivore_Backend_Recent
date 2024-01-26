@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface UserHistoryRepository extends MongoRepository<UserHistory, ObjectId> {
-    List<UserHistory> findAllByUserId(ObjectId userId);
+    List<UserHistory> findTop3ByUserIdOrderByHistoryDesc(ObjectId userId);
 }

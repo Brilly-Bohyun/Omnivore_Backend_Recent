@@ -38,7 +38,7 @@ public class UserHistoryService {
     }
 
     private List<UserHistory> getUserHistories(ObjectId userId) {
-        return userHistoryRepository.findAllByUserId(userId);
+        return userHistoryRepository.findTop3ByUserIdOrderByHistoryDesc(userId);
     }
 
     private Restaurant getRestaurant(ObjectId restaurantId) {
