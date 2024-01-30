@@ -1,13 +1,14 @@
 package omnivore.recent.repository;
 
-import omnivore.recent.entity.UserHistory;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import omnivore.recent.entity.RecentLog;
+import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@EnableScan
 @Repository
-public interface UserHistoryRepository extends MongoRepository<UserHistory, ObjectId> {
-    List<UserHistory> findTop3ByUserIdOrderByTimestampDesc(ObjectId userId);
+public interface UserHistoryRepository extends CrudRepository<RecentLog, String> {
+    List<RecentLog> findAllByUserId(String userId);
 }
