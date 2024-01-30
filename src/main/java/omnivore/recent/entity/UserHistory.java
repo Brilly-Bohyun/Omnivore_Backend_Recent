@@ -15,7 +15,7 @@ public class UserHistory {
 
     private ObjectId restaurant;
 
-    private LocalDateTime history;
+    private LocalDateTime timestamp;
 
     public ObjectId getRestaurant() {
         return restaurant;
