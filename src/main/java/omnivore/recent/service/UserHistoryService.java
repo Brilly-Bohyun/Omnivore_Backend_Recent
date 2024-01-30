@@ -5,15 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import omnivore.recent.dto.RecentInfo;
 import omnivore.recent.entity.Restaurant;
 import omnivore.recent.entity.User;
-import omnivore.recent.entity.UserHistory;
+import omnivore.recent.entity.RecentLog;
 import omnivore.recent.repository.RestaurantRepository;
 import omnivore.recent.repository.UserHistoryRepository;
 import omnivore.recent.repository.UserRepository;
-import org.bson.types.ObjectId;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
 
@@ -25,23 +26,41 @@ public class UserHistoryService {
     private final UserRepository userRepository;
     private final UserHistoryRepository userHistoryRepository;
     private final RestaurantRepository restaurantRepository;
+    private final TranslateService translateService;
+    private static final String SOURCE_LANGUAGE = "ko";
 
-    public List<RecentInfo> show (String jwt) {
+
+    public List<RecentInfo> show (String jwt, String targetLang) {
         String userEmail = getEmailFromPayload(parseJwtPayload(jwt));
         User user = getUserByEmail(userEmail);
-        List<UserHistory> userHistories = getUserHistories(user.getId());
-        return userHistories.stream().map(userHistory -> getRestaurant(userHistory.getRestaurant()).toDto()).toList();
+        List<RecentLog> userHistories = getUserHistories(user.getId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        return userHistories.stream()
+                .sorted((history1, history2) ->
+                        LocalDateTime.parse(history2.getTimestamp(), formatter)
+                                .compareTo(LocalDateTime.parse(history1.getTimestamp(), formatter))) // 내림차순 정렬
+                .limit(3) // 최대 3개까지 선택
+                .map(recentLog -> getRestaurant(recentLog.getRestaurantId()))
+                .map(restaurant -> RecentInfo.builder().id(restaurant.getId())
+                        .category(getTranslation(restaurant.getCategory(), targetLang))
+                        .name(getTranslation(restaurant.getName(), targetLang))
+                        .photo(restaurant.getPhoto()).build())
+                .toList();
+    }
+
+    private String getTranslation(String originText, String targetLang) {
+        return translateService.translate(originText, SOURCE_LANGUAGE, targetLang);
     }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 
-    private List<UserHistory> getUserHistories(ObjectId userId) {
-        return userHistoryRepository.findTop3ByUserIdOrderByTimestampDesc(userId);
+    private List<RecentLog> getUserHistories(String userId) {
+        return userHistoryRepository.findAllByUserId(userId);
     }
 
-    private Restaurant getRestaurant(ObjectId restaurantId) {
+    private Restaurant getRestaurant(String restaurantId) {
         return restaurantRepository.findById(restaurantId).orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 
