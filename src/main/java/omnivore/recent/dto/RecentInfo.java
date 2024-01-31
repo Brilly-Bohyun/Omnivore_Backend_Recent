@@ -11,6 +11,5 @@ public class RecentInfo {
     private String id;
     private String name;
     private String category;
-    private List<String> operation;
     private String photo;
 }

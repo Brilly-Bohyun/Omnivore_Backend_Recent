@@ -18,7 +18,8 @@ public class UserHistoryController {
     private final UserHistoryService userHistoryService;
 
     @GetMapping
-    public List<RecentInfo> showUserHistory (@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
-        return userHistoryService.show(jwt);
+    public List<RecentInfo> showUserHistory (@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
+                                             @RequestHeader("Language") String targetLang) {
+        return userHistoryService.show(jwt, targetLang);
     }
 }
