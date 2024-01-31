@@ -10,5 +10,5 @@ import java.util.List;
 @EnableScan
 @Repository
 public interface UserHistoryRepository extends CrudRepository<RecentLog, String> {
-    List<RecentLog> findAllByUserId(String userId);
+    List<RecentLog> findAllByEmail(String email);
 }

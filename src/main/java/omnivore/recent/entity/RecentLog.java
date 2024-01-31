@@ -19,15 +19,16 @@ public class RecentLog {
     private String id;
 
     @DynamoDBAttribute
-    private String userId;
+    private String email;
 
     @DynamoDBAttribute
-    private String restaurantId;
+    private String restaurant_id;
+
 
     @DynamoDBAttribute
-    private String timestamp;
+    private Double timestamp;
 
     public String getRestaurantId() {
-        return restaurantId;
+        return restaurant_id;
     }
 }
