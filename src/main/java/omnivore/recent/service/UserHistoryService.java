@@ -13,9 +13,8 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -32,14 +31,10 @@ public class UserHistoryService {
 
     public List<RecentInfo> show (String jwt, String targetLang) {
         String userEmail = getEmailFromPayload(parseJwtPayload(jwt));
-        User user = getUserByEmail(userEmail);
-        List<RecentLog> userHistories = getUserHistories(user.getId());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        List<RecentLog> userHistories = getUserHistories(userEmail);
         return userHistories.stream()
-                .sorted((history1, history2) ->
-                        LocalDateTime.parse(history2.getTimestamp(), formatter)
-                                .compareTo(LocalDateTime.parse(history1.getTimestamp(), formatter))) // 내림차순 정렬
-                .limit(3) // 최대 3개까지 선택
+                .sorted(Comparator.comparing(RecentLog::getTimestamp).reversed())
+                .limit(3)
                 .map(recentLog -> getRestaurant(recentLog.getRestaurantId()))
                 .map(restaurant -> RecentInfo.builder().id(restaurant.getId())
                         .category(getTranslation(restaurant.getCategory(), targetLang))
@@ -56,8 +51,8 @@ public class UserHistoryService {
         return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     }
 
-    private List<RecentLog> getUserHistories(String userId) {
-        return userHistoryRepository.findAllByUserId(userId);
+    private List<RecentLog> getUserHistories(String email) {
+        return userHistoryRepository.findAllByEmail(email);
     }
 
     private Restaurant getRestaurant(String restaurantId) {
