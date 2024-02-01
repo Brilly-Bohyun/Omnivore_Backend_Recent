@@ -22,7 +22,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserHistoryService {
-    private final UserRepository userRepository;
     private final UserHistoryRepository userHistoryRepository;
     private final RestaurantRepository restaurantRepository;
     private final TranslateService translateService;
@@ -47,16 +46,12 @@ public class UserHistoryService {
         return translateService.translate(originText, SOURCE_LANGUAGE, targetLang);
     }
 
-    private User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
-    }
-
     private List<RecentLog> getUserHistories(String email) {
         return userHistoryRepository.findAllByEmail(email);
     }
 
     private Restaurant getRestaurant(String restaurantId) {
-        return restaurantRepository.findById(restaurantId).orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+        return restaurantRepository.findById(restaurantId).orElseThrow(() -> new IllegalArgumentException("해당 레스토랑을 찾을 수 없습니다."));
     }
 
     private String parseJwtPayload(String jwt) {
