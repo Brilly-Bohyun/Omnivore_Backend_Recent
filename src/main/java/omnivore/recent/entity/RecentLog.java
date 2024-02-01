@@ -24,7 +24,6 @@ public class RecentLog {
     @DynamoDBAttribute
     private String restaurant_id;
 
-
     @DynamoDBAttribute
     private Double timestamp;
 
