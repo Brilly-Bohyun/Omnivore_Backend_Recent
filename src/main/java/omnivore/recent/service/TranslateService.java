@@ -49,5 +49,4 @@ public class TranslateService {
         }
         return null;
     }
-
 }
