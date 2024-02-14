@@ -49,8 +49,8 @@ jobs:
       run: chmod +x ./gradlew
       #gradle로 빌드시 사용
 
-    - name: Execute maven build
-      run: mvn clean package
+    - name: Build with Gradle
+      run: ./gradlew build
 
     - name: Docker Image Build
       id: build-image
