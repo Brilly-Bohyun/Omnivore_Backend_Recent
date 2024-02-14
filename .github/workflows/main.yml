@@ -49,8 +49,12 @@ jobs:
       run: chmod +x ./gradlew
       #gradle로 빌드시 사용
 
-    - name: 빌드 출력 목록
+    - name: Build with Gradle
+      run: ./gradlew build
+
+    - name: List JAR file
       run: ls -l build/libs/
+
 
     - name: Docker Image Build
       id: build-image
